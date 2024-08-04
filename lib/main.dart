@@ -1,8 +1,10 @@
+import 'package:chatting_app/image_provider.dart';
 import 'package:chatting_app/screens/imagefeed-screen.dart';
 import 'package:chatting_app/signin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart'; // Import provider
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,12 +15,15 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Image Feed',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (_) => CustomImageProvider(), // Updated class name
+      child: MaterialApp(
+        title: 'Image Feed',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: AuthScreen(),
       ),
-      home: AuthScreen(),
     );
   }
 }

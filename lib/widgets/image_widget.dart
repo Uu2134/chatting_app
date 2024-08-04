@@ -1,16 +1,19 @@
+import 'package:chatting_app/image_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chatting_app/models/image_model.dart';
 import 'package:chatting_app/widgets/interactive_icons.dart';
-import 'package:flutter/material.dart';
-import 'package:chatting_app/services/firebase_services.dart';
 
 class ImageWidget extends StatelessWidget {
   final ImageModel image;
   final VoidCallback onFavoriteToggle;
+  final VoidCallback onDelete;
 
   const ImageWidget({
     Key? key,
     required this.image,
     required this.onFavoriteToggle,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
@@ -63,7 +66,7 @@ class ImageWidget extends StatelessWidget {
             icon: Icon(Icons.delete, color: Colors.white),
             onPressed: () async {
               try {
-                await FirebaseService().deleteImage(image.id, image.imageUrl);
+                await Provider.of<CustomImageProvider>(context, listen: false).deleteImage(image.id, image.imageUrl);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Image deleted successfully')),
                 );

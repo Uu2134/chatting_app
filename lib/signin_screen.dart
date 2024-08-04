@@ -1,7 +1,9 @@
+import 'package:chatting_app/image_provider.dart';
 import 'package:chatting_app/screens/imagefeed-screen.dart';
-import 'package:flutter/material.dart';
+import 'package:chatting_app/signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'signup_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -19,6 +21,7 @@ class _SignInScreenState extends State<SignInScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      Provider.of<CustomImageProvider>(context, listen: false).fetchImages();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => ImageFeedScreen()),
       );

@@ -1,16 +1,19 @@
+import 'package:chatting_app/image_provider.dart';
 import 'package:chatting_app/screens/fav_screen.dart';
 import 'package:chatting_app/screens/setting.dart';
-import 'package:chatting_app/services/firebase_services.dart';
-import 'package:chatting_app/signin_screen.dart';
 import 'package:chatting_app/widgets/image-picker.dart';
 import 'package:chatting_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chatting_app/models/image_model.dart';
+import 'package:chatting_app/signin_screen.dart';
 
 class ImageFeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final imageProvider = Provider.of<CustomImageProvider>(context);
+    final images = imageProvider.images;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Image Feed'),
@@ -18,7 +21,7 @@ class ImageFeedScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () async {
-              await FirebaseService().signOut();
+              imageProvider.signOut();
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => SignInScreen()),
               );
@@ -26,18 +29,9 @@ class ImageFeedScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamProvider<List<ImageModel>>.value(
-        value: FirebaseService().getImages().handleError((error) {
-          print('Error fetching images: $error');
-        }),
-        initialData: [],
-        child: Consumer<List<ImageModel>>(
-          builder: (context, images, child) {
-            print('Images fetched: ${images.length}');
-            if (images.isEmpty) {
-              return Center(child: Text('No images available.'));
-            }
-            return PageView.builder(
+      body: images.isEmpty
+          ? Center(child: Text('No images available.'))
+          : PageView.builder(
               scrollDirection: Axis.vertical,
               itemCount: images.length,
               itemBuilder: (context, index) {
@@ -45,17 +39,17 @@ class ImageFeedScreen extends StatelessWidget {
                 return ImageWidget(
                   image: image,
                   onFavoriteToggle: () async {
-                    await FirebaseService().updateFavoriteStatus(
+                    await imageProvider.updateFavoriteStatus(
                       image.id,
                       !image.isFavorite,
                     );
                   },
+                  onDelete: () async {
+                    await imageProvider.deleteImage(image.id, image.imageUrl); // Pass both id and imageUrl
+                  },
                 );
               },
-            );
-          },
-        ),
-      ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -88,7 +82,7 @@ class ImageFeedScreen extends StatelessWidget {
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FavoritesScreen()),
+                MaterialPageRoute(builder: (context) => FavoriteScreen()),
               );
               break;
             case 2:

@@ -45,7 +45,7 @@ class FirebaseService {
     }
   }
 
-  Future<void> deleteImage(String imageId, String imageUrl) async {
+  Future<void> deleteImage(String imageId, String imageUrl) async { // Ensure both imageId and imageUrl are accepted
     final user = _auth.currentUser;
     if (user != null) {
       final doc = await _firestore.collection('images').doc(imageId).get();
