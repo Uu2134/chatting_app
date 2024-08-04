@@ -17,6 +17,14 @@ class FirebaseService {
     });
   }
 
+  Stream<List<ImageModel>> getFavoriteImages() {
+    return _firestore.collection('images').where('isFavorite', isEqualTo: true).snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return ImageModel.fromMap(doc.data(), doc.id);
+      }).toList();
+    });
+  }
+
   Future<void> updateFavoriteStatus(String id, bool isFavorite) async {
     await _firestore.collection('images').doc(id).update({'isFavorite': isFavorite});
   }
@@ -34,6 +42,23 @@ class FirebaseService {
         'caption': caption,
         'isFavorite': false,
       });
+    }
+  }
+
+  Future<void> deleteImage(String imageId, String imageUrl) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final doc = await _firestore.collection('images').doc(imageId).get();
+      if (doc.exists && doc.data()!['userId'] == user.uid) {
+        // Delete image file from storage
+        final ref = _storage.refFromURL(imageUrl);
+        await ref.delete();
+        
+        // Delete document from Firestore
+        await _firestore.collection('images').doc(imageId).delete();
+      } else {
+        throw Exception("You can only delete your own images.");
+      }
     }
   }
 

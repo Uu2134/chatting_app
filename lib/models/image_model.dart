@@ -22,7 +22,7 @@ class ImageModel {
       userId: data['userId'],
       username: data['username'],
       caption: data['caption'],
-      isFavorite: data['isFavorite'] ?? false,
+      isFavorite: data['isFavorite'] is bool ? data['isFavorite'] : false,
     );
   }
 

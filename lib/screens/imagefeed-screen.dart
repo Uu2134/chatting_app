@@ -2,6 +2,7 @@ import 'package:chatting_app/screens/fav_screen.dart';
 import 'package:chatting_app/screens/setting.dart';
 import 'package:chatting_app/services/firebase_services.dart';
 import 'package:chatting_app/signin_screen.dart';
+import 'package:chatting_app/widgets/image-picker.dart';
 import 'package:chatting_app/widgets/image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,10 +27,13 @@ class ImageFeedScreen extends StatelessWidget {
         ],
       ),
       body: StreamProvider<List<ImageModel>>.value(
-        value: FirebaseService().getImages(),
+        value: FirebaseService().getImages().handleError((error) {
+          print('Error fetching images: $error');
+        }),
         initialData: [],
         child: Consumer<List<ImageModel>>(
           builder: (context, images, child) {
+            print('Images fetched: ${images.length}');
             if (images.isEmpty) {
               return Center(child: Text('No images available.'));
             }
@@ -51,6 +55,15 @@ class ImageFeedScreen extends StatelessWidget {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ImagePickerWidget()),
+          );
+        },
+        child: Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

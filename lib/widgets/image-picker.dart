@@ -59,34 +59,41 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Upload Image')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: _captionController,
-              decoration: InputDecoration(labelText: 'Caption'),
-            ),
-            SizedBox(height: 20),
-            if (_imageFile != null)
-              Image.file(_imageFile!),
-            SizedBox(height: 20),
-            if (_imageFile != null)
-              ElevatedButton(
-                onPressed: _uploadImage,
-                child: Text('Upload Image'),
-              )
-            else
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: Text('Pick Image'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(labelText: 'Username'),
               ),
-          ],
+              TextField(
+                controller: _captionController,
+                decoration: InputDecoration(labelText: 'Caption'),
+              ),
+              SizedBox(height: 20),
+              if (_imageFile != null)
+                Container(
+                  constraints: BoxConstraints(
+                    maxHeight: 300,
+                  ),
+                  child: Image.file(_imageFile!),
+                ),
+              SizedBox(height: 20),
+              if (_imageFile != null)
+                ElevatedButton(
+                  onPressed: _uploadImage,
+                  child: Text('Upload Image'),
+                )
+              else
+                ElevatedButton(
+                  onPressed: _pickImage,
+                  child: Text('Pick Image'),
+                ),
+            ],
+          ),
         ),
       ),
     );

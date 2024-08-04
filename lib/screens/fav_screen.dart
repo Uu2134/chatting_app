@@ -9,22 +9,36 @@ class FavoritesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Images'),
+        title: Text('Favorites'),
       ),
       body: StreamProvider<List<ImageModel>>.value(
-        value: FirebaseService().getImages(),
+        value: FirebaseService().getFavoriteImages().handleError((error) {
+          print('Error fetching favorite images: $error');
+        }),
         initialData: [],
         child: Consumer<List<ImageModel>>(
-          builder: (context, images, child) {
-            final favoriteImages = images.where((image) => image.isFavorite).toList();
-            return ListView.builder(
+          builder: (context, favoriteImages, child) {
+            if (favoriteImages.isEmpty) {
+              return Center(child: Text('No favorite images.'));
+            }
+            return GridView.builder(
+              padding: const EdgeInsets.all(8.0),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // 2 columns
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
+                childAspectRatio: 1, // Adjust this ratio to fit your image aspect ratio
+              ),
               itemCount: favoriteImages.length,
               itemBuilder: (context, index) {
                 final image = favoriteImages[index];
                 return ImageWidget(
                   image: image,
                   onFavoriteToggle: () async {
-                    await FirebaseService().updateFavoriteStatus(image.id, !image.isFavorite);
+                    await FirebaseService().updateFavoriteStatus(
+                      image.id,
+                      !image.isFavorite,
+                    );
                   },
                 );
               },
